@@ -17,58 +17,6 @@
 */
 -->
 <resources>
-    <!-- A path similar to frameworks/base/core/res/res/values/config.xml
-      config_mainBuiltInDisplayCutout that describes a path larger than the exact path of a display
-      cutout. If present as well as config_enableDisplayCutoutProtection is set to true, then
-      SystemUI will draw this "protection path" instead of the display cutout path that is normally
-      used for anti-aliasing.
-      This path will only be drawn when the front-facing camera turns on, otherwise the main
-      DisplayCutout path will be rendered
-       -->
-    <string translatable="false" name="config_frontBuiltInDisplayCutoutProtection">M 493,60 a 45,45 0 1 0 94,0 45,45 0 1 0 -94,0 Z</string>
-
-    <!--  ID for the camera that needs extra protection -->
-    <string translatable="false" name="config_protectedCameraId">1</string>
-
-    <!--  Flag to turn on the rendering of the above path or not  -->
-    <bool name="config_enableDisplayCutoutProtection">true</bool>
-
-    <!-- Whether to enable framework dimming for UDFPS -->
-    <bool name="config_udfpsFrameworkDimming">true</bool>
-
-    <!-- Array of brightness-alpha LUT for framework dimming -->
-    <string-array name="config_udfpsDimmingBrightnessAlphaArray" translatable="false">
-          <item>0,247</item>
-          <item>7,222</item>
-          <item>22,216</item>
-          <item>27,209</item>
-          <item>30,205</item>
-          <item>35,201</item>
-          <item>39,199</item>
-          <item>45,195</item>
-          <item>51,189</item>
-          <item>56,185</item>
-          <item>60,180</item>
-          <item>67,174</item>
-          <item>71,170</item>
-          <item>80,162</item>
-          <item>90,152</item>
-          <item>96,145</item>
-          <item>101,140</item>
-          <item>107,133</item>
-          <item>114,124</item>
-          <item>121,115</item>
-          <item>136,94</item>
-          <item>142,83</item>
-          <item>149,64</item>
-          <item>155,45</item>
-          <item>160,6</item>
-          <item>255,1</item>
-    </string-array>
-
-    <!-- Color of the UDFPS pressed view -->
-    <color name="config_udfpsColor">#ff00ff00</color>
-
     <!-- Whether to play turbulence noise after clicking the play button -->
     <bool name="config_turbulenceNoise">false</bool>
 </resources>
