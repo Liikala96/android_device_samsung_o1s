@@ -5,9 +5,6 @@
 
 DEVICE_PATH := device/samsung/o1s
 
-# Kernel
-TARGET_KERNEL_CONFIG := samsung/o1s.config
-
 # Kernel Modules
 BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load))
 BOOT_KERNEL_MODULES := $(BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD)
