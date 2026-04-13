@@ -21,8 +21,8 @@ TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 # OTA assert
 TARGET_OTA_ASSERT_DEVICE := o1s
 
-# Inherit from exynos2100
-include device/samsung/exynos2100/BoardConfigCommon.mk
+# Inherit from universal2100
+include device/samsung/universal2100-common/BoardConfigCommon.mk
 
 # Inherit from the proprietary version
 include vendor/samsung/o1s/BoardConfigVendor.mk
