@@ -9,8 +9,3 @@ ro.vendor.fingerprint.type=udfps
 ro.carrier=unknown
 ro.radio.noril=no
 vendor.rild.libpath=/vendor/lib64/libsec-ril.so
-
-## WiFi
-ro.vendor.wifi.sap.interface=wlan1
-vendor.wifi.dualconcurrent.interface=wlan0
-wifi.concurrent.interface=wlan0
