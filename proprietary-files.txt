@@ -17,6 +17,7 @@ vendor/lib/soundfx/libswdap.so
 vendor/lib/soundfx/libswspatializer.so
 vendor/lib/lib_SamsungRec_08020.so
 vendor/lib/lib_SoundBooster_ver1050.so
+vendor/lib/lib_lvacfs.so
 vendor/lib/libaudioproxy2.so
 vendor/lib/librecordalive.so
 vendor/lib/spatializer-aidl-V1-cpp.so
@@ -28,7 +29,6 @@ vendor/lib64/soundfx/libswspatializer.so
 vendor/lib64/lib_SoundBooster_ver1050.so
 vendor/lib64/libaudioproxy2.so
 vendor/lib64/spatializer-aidl-V1-cpp.so
-vendor/lib/lib_lvacfs.so
 
 # Audio firmware
 vendor/firmware/APBargeIn_AUDIO_SLSI.bin
@@ -63,8 +63,8 @@ vendor/firmware/bcm4375B1_semco_sem.hcd
 # Camera
 vendor/lib64/hw/camera.exynos2100.so
 vendor/lib64/libexynoscamera3.so
-vendor/lib64/libexynoscamera_vpl_plugin.so
 vendor/lib64/libexynoscamera_ssl_plugin.so
+vendor/lib64/libexynoscamera_vpl_plugin.so
 
 # Camera dependencies
 vendor/lib64/libtriplecam_image_optical_zoom.so
