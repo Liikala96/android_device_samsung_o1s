@@ -1,5 +1,3 @@
-## vendor prop for o1s
-
 ## Fingerprint
 ro.vendor.fingerprint.force_calibrate=true   
 ro.vendor.fingerprint.sensor_location=540|1815|140
@@ -9,3 +7,8 @@ ro.vendor.fingerprint.type=udfps
 ro.carrier=unknown
 ro.radio.noril=no
 vendor.rild.libpath=/vendor/lib64/libsec-ril.so
+
+## Project Infinity-X Device Info Specs
+ro.product.marketname=Samsung Galaxy S21 5G
+ro.infinity.soc=Exynos 2100
+ro.infinity.camera=64MP + 12MP + 12MP
