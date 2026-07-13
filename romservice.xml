@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
-  <!-- A te saját, módosított S21 eszközfád (Lineage 23 ág) -->
-  <project path="device/samsung/o1s" name="Liikala96/android_device_samsung_o1s" remote="github" revision="lineage-23" />
+  <!-- A te saját, módosított S21 eszközfád (a pontos lineage-23.2 ágon) -->
+  <project path="device/samsung/o1s" name="szandis2/android_device_samsung_o1s" remote="github" revision="lineage-23.2" />
 
-  <!-- A közös Exynos 2100 platform fa (szintén Lineage 23 ágról) -->
-  <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-23" />
+  <!-- A közös Exynos 2100 platform fa (lineage-23.2 ág) -->
+  <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-23.2" />
 
-  <!-- Kernel fa -->
-  <project path="kernel/samsung/o1s" name="Exy2100-LOS/android_kernel_samsung_o1s" remote="github" revision="lineage-23" />
+  <!-- Kernel fa (lineage-23.2 ág) -->
+  <project path="kernel/samsung/o1s" name="Exy2100-LOS/android_kernel_samsung_o1s" remote="github" revision="lineage-23.2" />
 
-  <!-- Gyártói vendor fájlok -->
-  <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-23" />
-  <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-23" />
+  <!-- Gyártói vendor fájlok (lineage-23.2 ág) -->
+  <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-23.2" />
+  <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-23.2" />
   <project path="vendor/firmware" name="Exy2100-LOS/proprietary_vendor_firmware" remote="github" revision="master" />
 
-  <!-- Samsung-specifikus hardveres illesztők (Lineage 23 kompatibilis) -->
-  <project path="hardware/samsung" name="LineageOS/android_hardware_samsung" remote="github" revision="lineage-23" />
-  <project path="device/samsung_slsi/sepolicy" name="LineageOS/android_device_samsung_slsi_sepolicy" remote="github" revision="lineage-23" />
+  <!-- Samsung-specifikus hardveres illesztők és sepolicy (lineage-23.2 ág) -->
+  <project path="hardware/samsung" name="LineageOS/android_hardware_samsung" remote="github" revision="lineage-23.2" />
+  <project path="device/samsung_slsi/sepolicy" name="LineageOS/android_device_samsung_slsi_sepolicy" remote="github" revision="lineage-23.2" />
 </manifest>
