@@ -77,8 +77,8 @@ jobs:
           export PATH=$HOME/bin:$PATH
           mkdir -p workspace
           cd workspace
-          # Itt inicializáljuk az Infinity-X Android 16 (sixteen) ágát
-          repo init -u https://github.com/Infinity-X/manifest.git -b sixteen --git-lfs --depth=1
+          # A hivatalos Project Infinity-X manifest letöltése az Android 16-os (16) ágról
+          repo init -u https://github.com/projectinfinity-x/manifest.git -b 16 --git-lfs --depth=1
 
       - name: Setup Local Manifest
         run: |
@@ -90,7 +90,7 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <manifest>
             <!-- A te saját, módosított S21 eszközfád (Lineage 23 ág) -->
-            <project path="device/samsung/o1s" name="A-TE-GITHUB-NEVED/android_device_samsung_o1s" remote="github" revision="lineage-23" />
+            <project path="device/samsung/o1s" name="szandis2/android_device_samsung_o1s" remote="github" revision="lineage-23" />
 
             <!-- A közös Exynos 2100 platform fa (Lineage 23 ágról) -->
             <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-23" />
