@@ -1,0 +1,138 @@
+name: Project Infinity-X Build for S21
+
+on:
+  workflow_dispatch:
+    inputs:
+      device_target:
+        description: 'Válaszd ki a célhardvert (Device Target)'
+        required: true
+        default: 'o1s'
+        type: choice
+        options:
+          - 'o1s'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Free disk space (1/3)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
+
+      - name: Free disk space (2/3)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+
+      - name: Free disk space (3/3)
+        uses: rokibhasansagar/slimhub_actions@main
+        with:
+          retain: 'compiler_cmake'
+
+      - name: Set up build environment
+        run: |
+          sudo apt update
+          DEBIAN_FRONTEND=noninteractive sudo apt install -yq \
+            bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf \
+            imagemagick lib32readline-dev lib32z1-dev liblz4-tool libsdl1.2-dev libssl-dev \
+            libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
+            python3 python-is-python3 libpcre2-dev libzstd-dev lld
+          
+          # Git beállítások a repo eszközhöz
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Repo eszköz telepítése
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          echo "PATH=$HOME/bin:$PATH" >> $GITHUB_ENV
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up CCache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-infinity-${{ github.event.inputs.device_target }}-${{ github.sha }}
+          restore-keys: |
+            ccache-infinity-${{ github.event.inputs.device_target }}-
+
+      - name: Initialize Infinity-X Source
+        run: |
+          export PATH=$HOME/bin:$PATH
+          mkdir -p workspace
+          cd workspace
+          # Itt inicializáljuk az Infinity-X Android 16 (sixteen) ágát
+          repo init -u https://github.com/Infinity-X/manifest.git -b sixteen --git-lfs --depth=1
+
+      - name: Setup Local Manifest
+        run: |
+          cd workspace
+          mkdir -p .repo/local_manifests
+          
+          # Ide másoljuk be a te egyedi konfigurációdat
+          cat <<EOF > .repo/local_manifests/romservice.xml
+          <?xml version="1.0" encoding="UTF-8"?>
+          <manifest>
+            <!-- A te saját, módosított S21 eszközfád (Lineage 23 ág) -->
+            <project path="device/samsung/o1s" name="A-TE-GITHUB-NEVED/android_device_samsung_o1s" remote="github" revision="lineage-23" />
+
+            <!-- A közös Exynos 2100 platform fa (Lineage 23 ágról) -->
+            <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-23" />
+
+            <!-- Kernel fa -->
+            <project path="kernel/samsung/o1s" name="Exy2100-LOS/android_kernel_samsung_o1s" remote="github" revision="lineage-23" />
+
+            <!-- Gyártói vendor fájlok -->
+            <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-23" />
+            <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-23" />
+            <project path="vendor/firmware" name="Exy2100-LOS/proprietary_vendor_firmware" remote="github" revision="master" />
+
+            <!-- Samsung-specifikus hardveres illesztők -->
+            <project path="hardware/samsung" name="LineageOS/android_hardware_samsung" remote="github" revision="lineage-23" />
+            <project path="device/samsung_slsi/sepolicy" name="LineageOS/android_device_samsung_slsi_sepolicy" remote="github" revision="lineage-23" />
+          </manifest>
+          EOF
+
+      - name: Sync Sources
+        run: |
+          export PATH=$HOME/bin:$PATH
+          cd workspace
+          # Erőteljes szinkronizálás az optimális hálózathasználatért
+          repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
+
+      - name: Build ROM (Infinity-X)
+        run: |
+          export PATH=$HOME/bin:$PATH
+          export USE_CCACHE=1
+          export CCACHE_EXEC=/usr/bin/ccache
+          ccache -M 50G # 50 GB gyorsítótár beállítása
+          
+          cd workspace
+          source build/envsetup.sh
+          
+          # Az S21 (o1s) build indítása
+          lunch infinity_o1s-userdebug
+          mka bacon -j$(nproc --all)
+
+      - name: Upload Flashable ROM Zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-X-${{ github.event.inputs.device_target || 'o1s' }}-ROM
+          path: workspace/out/target/product/o1s/infinity_o1s-*.zip
+          if-no-files-found: error
