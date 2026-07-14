@@ -110,19 +110,19 @@ jobs:
           cd workspace
           repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
-      - name: Patch Target Architecture and Fix LiveDisplay for Android 16
+      - name: Patch Target Architecture and Fix Samsung HIDL for Android 16
         run: |
           cd workspace
           # 1. Villámgyors architektúra javítás (csak a Samsung eszközfákon belül keres)
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. LiveDisplay hiba kiiktatása az Android.bp átnevezésével (hogy a Soong átugorhassa)
-          if [ -f hardware/samsung/hidl/livedisplay/Android.bp ]; then
-            mv hardware/samsung/hidl/livedisplay/Android.bp hardware/samsung/hidl/livedisplay/Android.bp.bak
-            echo "LiveDisplay compilation disabled to bypass vendor.lineage.livedisplay dependency error."
+          # 2. Az összes elavult, hiányzó LineageOS függőséggel rendelkező Samsung HIDL modul kiiktatása
+          if [ -d hardware/samsung/hidl ]; then
+            mv hardware/samsung/hidl hardware/samsung/hidl.bak
+            echo "All legacy Samsung HIDL modules disabled to bypass missing lineage dependency errors."
           else
-            echo "LiveDisplay Android.bp not found or already disabled."
+            echo "Samsung HIDL directory not found or already disabled."
           fi
 
       - name: Build ROM (Infinity-X)
