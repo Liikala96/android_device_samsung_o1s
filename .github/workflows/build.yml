@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 360  # JAVÍTVA: Megemelt időkorlát, hogy ne szakadjon meg a build a lassú lemezműveletek vagy a fordítás miatt!
+    timeout-minutes: 360
 
     steps:
       - name: Checkout repo
@@ -40,7 +40,7 @@ jobs:
         with:
           retain: 'compiler_cmake'
 
-      - name: Set up build environment
+      - name: Set up build environment & Swap Space
         run: |
           sudo apt update
           DEBIAN_FRONTEND=noninteractive sudo apt install -yq \
@@ -48,6 +48,15 @@ jobs:
             imagemagick lib32readline-dev lib32z1-dev liblz4-tool libsdl1.2-dev libssl-dev \
             libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
             python3 python-is-python3 libpcre2-dev libzstd-dev lld
+          
+          # 16 GB SWAP FÁJL LÉTREHOZÁSA (Ha elfogy a fizikai RAM, ide lapoz a Soong, így nem omlik össze)
+          sudo swapoff -a || true
+          sudo dd if=/dev/zero of=/swapfile bs=1M count=16384
+          sudo chmod 0600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          echo "Swap space successfully created and enabled."
+          free -m
           
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -118,7 +127,7 @@ jobs:
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. JAVÍTVA: A teljes hidl mappa fizikai törlése, hogy a Soong véletlenül se olvassa be rekurzívan (.bak-ként sem)
+          # 2. A teljes hidl mappa fizikai törlése, hogy a Soong ne olvassa be
           if [ -d hardware/samsung/hidl ]; then
             rm -rf hardware/samsung/hidl
             echo "All legacy Samsung HIDL modules physically removed to bypass dependency errors."
@@ -133,9 +142,13 @@ jobs:
           export CCACHE_EXEC=/usr/bin/ccache
           ccache -M 50G
           
+          # Memória-optimalizációk, hogy a Java és Go ne zabálja fel az összes RAM-ot generálás közben
           export WITH_GAPPS=true
           export TARGET_HAS_UDFPS=true
           export INFINITY_MAINTAINER="Liikala96"
+          export _JAVA_OPTIONS="-Xmx8g"
+          export GOGC=50
+          export NINJA_ARGS="-j2"  # Visszafogott párhuzamosítás a Ninja elemzésnél, hogy ne fagyjon le
           
           cd workspace
           source build/envsetup.sh
