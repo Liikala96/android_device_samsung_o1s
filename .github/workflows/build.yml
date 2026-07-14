@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 360
+    timeout-minutes: 360  # Megemelt időkorlát az órákig tartó C++ fordításhoz
 
     steps:
       - name: Checkout repo
@@ -118,6 +118,13 @@ jobs:
         run: |
           export PATH=$HOME/bin:$PATH
           cd workspace
+          
+          # JAVÍTVA: Ha létezik a sérült asuite mappa vagy a Git metaadatai, gyökerestül kiirtjuk őket a letöltés előtt
+          rm -rf prebuilts/asuite
+          rm -rf .repo/projects/prebuilts/asuite.git
+          rm -rf .repo/project-objects/platform/prebuilts/asuite.git
+          
+          # Indulhat a tiszta szinkronizálás
           repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
       - name: Patch Target Architecture and Fix Samsung HIDL for Android 16
@@ -127,7 +134,7 @@ jobs:
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. A teljes hidl mappa fizikai törlése, hogy a Soong ne olvassa be
+          # 2. A teljes hidl mappa fizikai törlése, hogy a Soong ne olvassa be rekurzívan
           if [ -d hardware/samsung/hidl ]; then
             rm -rf hardware/samsung/hidl
             echo "All legacy Samsung HIDL modules physically removed to bypass dependency errors."
