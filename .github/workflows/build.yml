@@ -104,9 +104,11 @@ jobs:
       - name: Patch Target Architecture for Android 16
         run: |
           cd workspace
-          # Megkeressük a hibás armv8-a beállításokat az eszközfákban és átírjuk armv8-2a-ra
-          find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
-          find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
+          # Globális keresés és csere az egész forráskódban (.mk kiterjesztésű fájlokra szűrve)
+          find . -name "*.mk" -type f -not -path "*/.git/*" -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
+          find . -name "*.mk" -type f -not -path "*/.git/*" -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
+          # Biztonsági ellenőrzésképpen kiírjuk a konzolra, mi maradt
+          grep -rn "TARGET_2ND_ARCH_VARIANT" . || true
 
       - name: Build ROM (Infinity-X)
         run: |
