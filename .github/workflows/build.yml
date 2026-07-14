@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 360  # Megemelt időkorlát az órákig tartó C++ fordításhoz
+    timeout-minutes: 360
 
     steps:
       - name: Checkout repo
@@ -49,13 +49,13 @@ jobs:
             libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
             python3 python-is-python3 libpcre2-dev libzstd-dev lld
           
-          # 16 GB SWAP FÁJL LÉTREHOZÁSA (Ha elfogy a fizikai RAM, ide lapoz a Soong, így nem omlik össze)
+          # JAVÍTVA: 16 GB helyett csak 6 GB (6144 MB) SWAP-ot hozunk létre, hogy maradjon hely a forráskódnak!
           sudo swapoff -a || true
-          sudo dd if=/dev/zero of=/swapfile bs=1M count=16384
+          sudo dd if=/dev/zero of=/swapfile bs=1M count=6144
           sudo chmod 0600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
-          echo "Swap space successfully created and enabled."
+          echo "Optimized swap space (6GB) successfully enabled."
           free -m
           
           git config --global user.name "github-actions[bot]"
@@ -119,27 +119,24 @@ jobs:
           export PATH=$HOME/bin:$PATH
           cd workspace
           
-          # JAVÍTVA: Ha létezik a sérült asuite mappa vagy a Git metaadatai, gyökerestül kiirtjuk őket a letöltés előtt
-          rm -rf prebuilts/asuite
-          rm -rf .repo/projects/prebuilts/asuite.git
-          rm -rf .repo/project-objects/platform/prebuilts/asuite.git
+          # Ha léteznek sérült vagy megszakadt mappák, töröljük őket
+          rm -rf prebuilts/asuite prebuilts/clang/host/linux-x86
+          rm -rf .repo/projects/prebuilts/asuite.git .repo/projects/prebuilts/clang/host/linux-x86.git
           
-          # Indulhat a tiszta szinkronizálás
-          repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
+          # JAVÍTVA: Hozzáadva a '--depth=1' a szinkronizáláshoz is, hogy ne töltsük le a felesleges git előzményeket!
+          repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune --depth=1
 
       - name: Patch Target Architecture and Fix Samsung HIDL for Android 16
         run: |
           cd workspace
-          # 1. Villámgyors architektúra javítás (csak a Samsung eszközfákon belül)
+          # 1. Villámgyors architektúra javítás
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. A teljes hidl mappa fizikai törlése, hogy a Soong ne olvassa be rekurzívan
+          # 2. A teljes hidl mappa fizikai törlése
           if [ -d hardware/samsung/hidl ]; then
             rm -rf hardware/samsung/hidl
-            echo "All legacy Samsung HIDL modules physically removed to bypass dependency errors."
-          else
-            echo "Samsung HIDL directory already removed."
+            echo "All legacy Samsung HIDL modules physically removed."
           fi
 
       - name: Build ROM (Infinity-X)
@@ -149,13 +146,12 @@ jobs:
           export CCACHE_EXEC=/usr/bin/ccache
           ccache -M 50G
           
-          # Memória-optimalizációk, hogy a Java és Go ne zabálja fel az összes RAM-ot generálás közben
           export WITH_GAPPS=true
           export TARGET_HAS_UDFPS=true
           export INFINITY_MAINTAINER="Liikala96"
           export _JAVA_OPTIONS="-Xmx8g"
           export GOGC=50
-          export NINJA_ARGS="-j2"  # Visszafogott párhuzamosítás a Ninja elemzésnél, hogy ne fagyjon le
+          export NINJA_ARGS="-j2"
           
           cd workspace
           source build/envsetup.sh
