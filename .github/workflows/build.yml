@@ -117,12 +117,12 @@ jobs:
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. Az összes elavult, hiányzó LineageOS függőséggel rendelkező Samsung HIDL modul kiiktatása
+          # 2. A teljes hidl mappa fizikai törlése, hogy a Soong véletlenül se olvassa be
           if [ -d hardware/samsung/hidl ]; then
-            mv hardware/samsung/hidl hardware/samsung/hidl.bak
-            echo "All legacy Samsung HIDL modules disabled to bypass missing lineage dependency errors."
+            rm -rf hardware/samsung/hidl
+            echo "All legacy Samsung HIDL modules physically removed to bypass dependency errors."
           else
-            echo "Samsung HIDL directory not found or already disabled."
+            echo "Samsung HIDL directory already removed."
           fi
 
       - name: Build ROM (Infinity-X)
