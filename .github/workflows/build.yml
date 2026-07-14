@@ -110,13 +110,20 @@ jobs:
           cd workspace
           repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
-      - name: Patch Target Architecture for Android 16
+      - name: Patch Target Architecture and Fix LiveDisplay for Android 16
         run: |
           cd workspace
-          # Globális javítás a forráskódban lévő armv8-a variánsokra
-          find . -name "*.mk" -type f -not -path "*/.git/*" -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
-          find . -name "*.mk" -type f -not -path "*/.git/*" -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
-          grep -rn "TARGET_2ND_ARCH_VARIANT" . || true
+          # 1. Villámgyors architektúra javítás (csak a Samsung eszközfákon belül keres)
+          find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
+          find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
+          
+          # 2. LiveDisplay hiba kiiktatása az Android.bp átnevezésével (hogy a Soong átugorhassa)
+          if [ -f hardware/samsung/hidl/livedisplay/Android.bp ]; then
+            mv hardware/samsung/hidl/livedisplay/Android.bp hardware/samsung/hidl/livedisplay/Android.bp.bak
+            echo "LiveDisplay compilation disabled to bypass vendor.lineage.livedisplay dependency error."
+          else
+            echo "LiveDisplay Android.bp not found or already disabled."
+          fi
 
       - name: Build ROM (Infinity-X)
         run: |
