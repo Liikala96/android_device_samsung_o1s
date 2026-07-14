@@ -85,7 +85,7 @@ jobs:
           <?xml version="1.0" encoding="UTF-8"?>
           <manifest>
             <project path="device/samsung/o1s" name="Liikala96/android_device_samsung_o1s" remote="github" revision="lineage-23.2" />
-            <project path="device/samsung/universal2100-common" name="LineageOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-21" />
+            <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-20" />
             <project path="kernel/samsung/o1s" name="FlopKernel-Series/flop_exynos2100_kernel" remote="github" revision="floppy-main" />
             <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-20" />
             <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-20" />
