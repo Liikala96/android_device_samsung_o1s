@@ -92,20 +92,20 @@ jobs:
             <!-- A te saját, módosított S21 eszközfád a valós Liikala96 profilon -->
             <project path="device/samsung/o1s" name="Liikala96/android_device_samsung_o1s" remote="github" revision="lineage-23.2" />
 
-            <!-- A közös Exynos 2100 platform fa (a csapatnál létező lineage-23 ágon) -->
-            <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-23" />
+            <!-- A közös Exynos 2100 platform fa (Exy2100-LOS-nál létező lineage-20 ágon) -->
+            <project path="device/samsung/universal2100-common" name="Exy2100-LOS/android_device_samsung_universal2100-common" remote="github" revision="lineage-20" />
 
             <!-- A HIVATALOS FLOPKERNEL FORRÁS a valós floppy-main ágon -->
             <project path="kernel/samsung/o1s" name="FlopKernel-Series/flop_exynos2100_kernel" remote="github" revision="floppy-main" />
 
-            <!-- Gyártói vendor fájlok (szintén lineage-23 ágon) -->
-            <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-23" />
-            <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-23" />
-            <project path="vendor/firmware" name="Exy2100-LOS/proprietary_vendor_firmware" remote="github" revision="master" />
+            <!-- Gyártói vendor és firmware fájlok (bizonyítottan lineage-20 ágon) -->
+            <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-20" />
+            <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-20" />
+            <project path="vendor/firmware" name="Exy2100-LOS/proprietary_vendor_firmware" remote="github" revision="lineage-20" />
 
-            <!-- Samsung-specifikus hardveres illesztők -->
-            <project path="hardware/samsung" name="LineageOS/android_hardware_samsung" remote="github" revision="lineage-23" />
-            <project path="device/samsung_slsi/sepolicy" name="LineageOS/android_device_samsung_slsi_sepolicy" remote="github" revision="lineage-23" />
+            <!-- Samsung-specifikus hardveres illesztők (biztosan létező lineage-21 ágon) -->
+            <project path="hardware/samsung" name="LineageOS/android_hardware_samsung" remote="github" revision="lineage-21" />
+            <project path="device/samsung_slsi/sepolicy" name="LineageOS/android_device_samsung_slsi_sepolicy" remote="github" revision="lineage-21" />
           </manifest>
           EOF
 
