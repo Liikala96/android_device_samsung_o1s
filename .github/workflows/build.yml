@@ -18,6 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    timeout-minutes: 360  # JAVÍTVA: Megemelt időkorlát, hogy ne szakadjon meg a build a lassú lemezműveletek vagy a fordítás miatt!
 
     steps:
       - name: Checkout repo
@@ -113,11 +114,11 @@ jobs:
       - name: Patch Target Architecture and Fix Samsung HIDL for Android 16
         run: |
           cd workspace
-          # 1. Villámgyors architektúra javítás (csak a Samsung eszközfákon belül keres)
+          # 1. Villámgyors architektúra javítás (csak a Samsung eszközfákon belül)
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. A teljes hidl mappa fizikai törlése, hogy a Soong véletlenül se olvassa be
+          # 2. JAVÍTVA: A teljes hidl mappa fizikai törlése, hogy a Soong véletlenül se olvassa be rekurzívan (.bak-ként sem)
           if [ -d hardware/samsung/hidl ]; then
             rm -rf hardware/samsung/hidl
             echo "All legacy Samsung HIDL modules physically removed to bypass dependency errors."
