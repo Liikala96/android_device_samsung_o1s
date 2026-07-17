@@ -49,7 +49,6 @@ jobs:
             libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
             python3 python-is-python3 libpcre2-dev libzstd-dev lld
           
-          # 6 GB (6144 MB) SWAP létrehozása a stabil Soong elemzéshez, hogy maradjon hely a forráskódnak is
           sudo swapoff -a || true
           sudo dd if=/dev/zero of=/swapfile bs=1M count=6144
           sudo chmod 0600 /swapfile
@@ -94,21 +93,12 @@ jobs:
           cat <<EOF > .repo/local_manifests/romservice.xml
           <?xml version="1.0" encoding="UTF-8"?>
           <manifest>
-            <!-- A működő S21 eszközfa -->
             <project path="device/samsung/o1s" name="Liikala96/android_device_samsung_o1s" remote="github" revision="lineage-23.2" />
-            
-            <!-- A létező közös Exynos platform fa az Exynoobs-tól -->
             <project path="device/samsung/universal2100-common" name="Exynoobs/android_device_samsung_universal2100-common" remote="github" revision="lineage-20" />
-            
-            <!-- FlopKernel valódi floppy-main ága -->
             <project path="kernel/samsung/o1s" name="FlopKernel-Series/flop_exynos2100_kernel" remote="github" revision="floppy-main" />
-            
-            <!-- Vendorok és firmware-ek -->
             <project path="vendor/samsung/o1s" name="Exy2100-LOS/android_vendor_samsung_o1s" remote="github" revision="lineage-20" />
             <project path="vendor/samsung/universal2100-common" name="Exy2100-LOS/android_vendor_samsung_universal2100-common" remote="github" revision="lineage-20" />
             <project path="vendor/firmware" name="Exy2100-LOS/proprietary_vendor_firmware" remote="github" revision="lineage-20" />
-            
-            <!-- Hardveres illesztők -->
             <project path="hardware/samsung" name="LineageOS/android_hardware_samsung" remote="github" revision="lineage-21" />
             <project path="device/samsung_slsi/sepolicy" name="LineageOS/android_device_samsung_slsi_sepolicy" remote="github" revision="lineage-21" />
           </manifest>
@@ -119,24 +109,32 @@ jobs:
           export PATH=$HOME/bin:$PATH
           cd workspace
           
-          # Ha léteznek sérült vagy megszakadt mappák, töröljük őket a szinkronizáció előtt
           rm -rf prebuilts/asuite prebuilts/clang/host/linux-x86
           rm -rf .repo/projects/prebuilts/asuite.git .repo/projects/prebuilts/clang/host/linux-x86.git
           
-          # JAVÍTVA: Eltávolítva a hibás --depth opció, a többi optimális letöltési beállítás maradt!
           repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
       - name: Patch Target Architecture and Fix Samsung HIDL for Android 16
         run: |
           cd workspace
-          # 1. Villámgyors architektúra javítás
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT := armv8-a/TARGET_2ND_ARCH_VARIANT := armv8-2a/g' {} +
           find device/samsung/ -name "*.mk" -type f -exec sed -i 's/TARGET_2ND_ARCH_VARIANT :=armv8-a/TARGET_2ND_ARCH_VARIANT :=armv8-2a/g' {} +
           
-          # 2. A teljes hidl mappa fizikai törlése
           if [ -d hardware/samsung/hidl ]; then
             rm -rf hardware/samsung/hidl
             echo "All legacy Samsung HIDL modules physically removed."
+          fi
+
+          mkdir -p vendor/lineage/config
+          if [ -f vendor/infinity/config/device_framework_matrix.xml ]; then
+            cp vendor/infinity/config/device_framework_matrix.xml vendor/lineage/config/device_framework_matrix.xml
+            echo "Copied matrix from infinity."
+          elif [ -f vendor/infinity-x/config/device_framework_matrix.xml ]; then
+            cp vendor/infinity-x/config/device_framework_matrix.xml vendor/lineage/config/device_framework_matrix.xml
+            echo "Copied matrix from infinity-x."
+          else
+            echo '<compatibility-matrix version="1.0" type="framework"></compatibility-matrix>' > vendor/lineage/config/device_framework_matrix.xml
+            echo "Created fallback empty framework matrix."
           fi
 
       - name: Build ROM (Infinity-X)
